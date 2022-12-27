@@ -35,6 +35,52 @@ question 7:
 select CITY,STATE from station
 
 
+
+question 28 :
+create table Customers
+(customer_id  int, name  varchar(20), country varchar(20));
+
+insert into Customers values
+(1,'Winston','USA'),
+(2,'Jonathan','Peru'),
+(3,'Moustafa','Egypt');
+
+create table Product
+(product_id   int, description varchar(20), price int);
+
+insert into Product values
+(10,'LC Phone' ,300 ),
+(20,'LC T-Shirt', 10 ),
+(30,'LC Book' ,45 ),
+(40,'LC Keychain', 2 );
+
+create table Orders
+(order_id    int, customer_id int, product_id  int, order_date  date, quantity  int);
+
+insert into Orders values
+(1,1,10,'2020-06-10',1 ),
+(2,1,20,'2020-07-01',1 ),
+(3,1,30,'2020-07-08',2 ),
+(4,2,10,'2020-06-15',2 ),
+(5,2,40,'2020-07-01',10),
+(6,3,20,'2020-06-24',2 ),
+(7,3,30,'2020-06-25',2 ),
+(9,3,30,'2020-05-08',3 );
+
+
+select o.customer_id, c.name
+from Customers c, Product p, Orders o
+where c.customer_id = o.customer_id and p.product_id = o.product_id
+group by o.customer_id,c.name
+having 
+(
+    sum(case when extract(year_month from o.order_date) =  '202006' then o.quantity*p.price else 0 end) >= 100
+    and
+    sum(case when extract(year_month from o.order_date) =  '202007' then o.quantity*p.price else 0 end) >= 100
+);
+
+
+
 question 8:
 select city from station where id%2=0
 
@@ -284,3 +330,237 @@ WHERE mail REGEXP ('^[a-zA-Z][a-zA-Z0-9\_\.\-]*@leetcode.com');
 
 
 
+question 29:
+create table TVProgram
+(program_date   date,content_id  int, channel   varchar(20));
+
+insert into TVProgram values
+(STR_TO_DATE('2020-06-10 08:00','%Y-%m-%d %H:%i'),1,'LC-Channel'),
+(STR_TO_DATE('2020-05-11 12:00','%Y-%m-%d %H:%i'),2,'LC-Channel'),
+(STR_TO_DATE('2020-05-12 12:00','%Y-%m-%d %H:%i'),3,'LC-Channel'),
+(STR_TO_DATE('2020-05-13 14:00','%Y-%m-%d %H:%i'),4,'Disney Ch'),
+(STR_TO_DATE('2020-06-18 14:00','%Y-%m-%d %H:%i'),4,'Disney Ch'),
+(STR_TO_DATE('2020-07-15 16:00','%Y-%m-%d %H:%i'),5,'Disney Ch');
+
+create table Content
+(content_id int,title  varchar(20), Kids_content  varchar(2), content_type  varchar(20));
+insert into Content values
+(1,'Leetcode Movie','N','Movies'),
+(2,'Alg. for Kids','Y','Series'),
+(3,'Database Sols','N','Series'),
+(4,'Aladdin','Y','Movies'),
+(5,'Cinderella','Y','Movies');
+
+
+
+    
+    
+    
+select distinct title
+from Content c
+join TVProgram t on c.content_id = t.content_id
+where kids_content = 'Y' 
+    and content_type = 'Movies' 
+    and extract(year_month from program_date) = '202006';
+
+question 31:
+create table NPV
+(id   int, year   int, npv    int);
+
+insert into NPV values
+(1 ,2018,100),
+(7 ,2020,30 ),
+(13,2019,40 ),
+(1 ,2019,113),
+(2 ,2008,121),
+(3 ,2009,12 ),
+(11,2020,99 ),
+(7 ,2019,0  );
+
+create table Queries
+(id int, year int);
+
+insert into Queries values
+(1 ,2019),
+(2 ,2008),
+(3 ,2009),
+(7 ,2018),
+(7 ,2019),
+(7 ,2020),
+(13,2019);
+
+select q.id, q.year, ifnull(n.npv,0) as npv
+from NPV as n
+right join 
+Queries as q
+on  (n.id, n.year) = (q.id, q.year);
+
+
+question 32:
+create  table Employees
+(id int, name  varchar(20));
+
+insert into Employees values
+(1,'Alice'),
+(7,'Bob'),
+(11,'Meir'),
+(90,'Winston'),
+(3,'Jonathan');
+
+create  table EmployeeUNI
+(id int, unique_id int);
+
+insert into EmployeeUNI values
+(3 ,1),
+(11,2),
+(90,3);
+
+select IFNULL(unique_id,'null')unique_id , name
+from Employees emp
+left join EmployeeUNI euni
+on (emp.id = euni.id);
+
+
+question 33:
+create table Users
+(id  int, name  varchar(20));
+
+insert into Users values
+(1 ,'Alice'),
+(2 ,'Bob'),
+(3 ,'Alex'),
+(4 ,'Donald'),
+(7 ,'Lee'),
+(13,'Jonathan'),
+(19,'Elvis');
+
+create table Rides
+(id   int, user_id  int, distance int);
+
+insert into Rides values
+(1,1 ,120),
+(2,2 ,317),
+(3,3 ,222),
+(4,7 ,100),
+(5,13,312),
+(6,19,50 ),
+(7,7 ,120),
+(8,19,400),
+(9,7 ,230);
+
+select name, sum(ifnull(distance, 0)) as travelled_distance
+from Rides r
+right join Users u
+on r.user_id = u.id
+group by name
+order by travelled_distance desc,name asc;
+
+
+
+
+question 34 :
+select  product_name from (
+select  distinct product_name,sum(o.unit) over (partition by o.product_id) total_ordered
+from Products p
+join
+Orders o
+on  
+p.product_id = o.product_id
+where extract(year_month from o.order_date) = '202002')
+temp where temp.total_ordered >= 100 ;
+
+
+
+question 37:
+create  table Departments
+(id   int,name  varchar(30));
+
+insert into Departments values
+(1 ,'Electrical Engineering  '),
+(7 ,'Computer Engineering    '),
+(13,'Bussiness Administration');
+
+create  table Students
+(id   int,name   varchar(30), department_id int);
+
+insert into Students values
+(23,'Alice',1 ),
+(1 ,'Bob',7 ),
+(5 ,'Jennifer',13),
+(2 ,'John',14),
+(4 ,'Jasmine',77),
+(3 ,'Steve',74),
+(6 ,'Luis',1 ),
+(8 ,'Jonathan',7 ),
+(7 ,'Daiana',33),
+(11,'Madelynn',1 );
+
+select s.id, s.name
+from Students s
+left join Departments d
+on s.department_id = d.id
+where d.id is null;
+
+
+
+question 42:
+create table warehouse(
+name varchar(20),
+product_id int,
+units int);
+
+create table products(
+product_id int,
+product_name varchar(20),
+width int,
+length int,
+height int);
+
+insert into warehouse values
+('LCHouse1',1,1),
+('LCHouse1',2,10),
+('LCHouse1',3,5),
+('LCHouse2',1,2),
+('LCHouse2',2,2),
+('LCHouse3',4,1);
+
+
+
+insert into products values
+(1,'LC-TV',5,50,40),
+(2,'LC-KeyChain',5,5,5),
+(3,'LC-Phone',2,10,10),
+(4,'LC-T-Shirt',4,10,20);
+
+select name as warehouse_name,sum(a.cubic_volumne * units) 
+from warehouse w join 
+    (select product_id,
+    product_name,length,width,height,
+    (length * width * height) cubic_volumne
+    from products)a 
+    on w.product_id = a.product_id group by warehouse_name;
+
+
+question 42:
+create table sales
+(
+    sale_date date,
+    fruit enum('apples','oranges'),
+    sold_num INT
+);
+
+insert into sales VALUES
+('2020-05-01','apples',10),
+('2020-05-01','oranges',8),
+('2020-05-02','apples',15),
+('2020-05-02','oranges',15),
+('2020-05-03','apples',20),
+('2020-05-03','oranges',0),
+('2020-05-04','apples',15),
+('2020-05-04','oranges',16);
+
+
+
+select sale_date,diff from (select *,sold_num-(lead(sold_num) over(partition by sale_date)) 
+diff from sales order by sale_date,fruit)a
+where a.fruit = 'apples';
