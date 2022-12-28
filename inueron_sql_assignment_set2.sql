@@ -78,4 +78,57 @@ insert into Employee values
 
 select employee_id,count(team_id)  over (partition by team_id) as team from Employee ORDER BY employee_id ASC
 
+question 57:
+
+create database jj
+use jj
+
+
+
+
+
+create table Orders(
+order_number int, customer_number int, PRIMARY KEY (order_number));
+
+insert into Orders values
+(1,1),
+(2,2),
+(3,3),
+(4,3);
+
+
+
+
+select customer_number from(
+select customer_number,count(*) orders_placed from Orders
+group by customer_number order by orders_placed desc limit 1)a
+
+
+
+
+insert into Orders values(5,1)
+
+
+select * from(
+select customer_number,count(*) orders_placed from Orders
+group by customer_number order by orders_placed desc limit 1)a
+-- works only for one maximum record
+
+
+question- 60 
+
+create table Triangle
+(x int,y int,z int,PRIMARY KEY(x,y,z));
+
+insert into Triangle values
+(13,15,30),
+(10,20,15);
+
+select x,y,z,
+case
+    when 
+            x+y>z and y+z>x and z+x> y then 'YES'
+    else 'NO'
+end as triangle
+from Triangle;
 
