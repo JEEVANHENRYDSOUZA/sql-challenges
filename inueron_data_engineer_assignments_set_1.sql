@@ -89,6 +89,16 @@ select city from station where id%2=0
 question 9:
 select count(city)- count(DISTINCT(city)) from station
 
+question 10:
+(select city, length(city)
+from station
+order by length(city), city
+limit 1)
+union
+(select city, length(city)
+from station
+order by length(city) desc, city
+limit 1)
 
 
 question 11:
